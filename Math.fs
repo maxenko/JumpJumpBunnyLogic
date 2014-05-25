@@ -48,3 +48,7 @@ module Math =
         Seq.head ( Seq.skip idx s )
 
     let updateRateMS nthOfSecond = 1000.f/nthOfSecond
+
+    let decide (p:Probability) =
+        let max = 5 - (int <| p)
+        rnd.Next(0,max) = rnd.Next(0,max)

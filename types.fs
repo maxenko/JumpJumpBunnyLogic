@@ -17,6 +17,14 @@ type Powerups =
 | SpawnIslandsAroundAndExtendCurrent = 16
 | EatOneEnemy   = 32
 
+type PowerupFrequency =
+| Never     = 0
+| Seldom    = 1
+| Regular   = 2
+| MoreOften = 3
+| Frequent  = 4
+| Spam      = 5
+
 type IslandDifficulty =
 | Effortless    = 0
 | VeryEasy      = 1
@@ -44,6 +52,12 @@ type IslandRespawnDelay =
 | Posponed  = 8
 | Awhile    = 9
 | Long      = 10
+
+type Probability =
+| Rarely    = 0
+| Sometimes = 1
+| Often     = 2
+| VeryOften = 3
 
 type IUpdate =
     abstract Update : unit -> unit

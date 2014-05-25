@@ -69,15 +69,21 @@ type IslandOccupiedArgs( entity:Proto, from:HexCellCoord ) =
 
 type Enemy(duration) as self = 
     inherit Proto()
+    static let offGridLocation = new HexCellCoord(-1000000,-1000000,-1000000)
+    let mutable location = offGridLocation
     let rate = Math.updateRateMS 12.f
     let mutable d = duration
     let mutable lifeLeft = duration
     let mutable deSpawned = false
     let edgeReached = new Event<Enemy>()
     let deSpawn     = new Event<Proto>()
+
     member x.Duration with get() = d and set(value) = d <- value
     member x.EdgeReached = edgeReached.Publish
     member x.Despawn = deSpawn.Publish
+    member x.IsDespawned() = deSpawned
+    member x.Spawn(loc:HexCellCoord) =  location <- loc
+    member x.MoveOffGrid() = location <- offGridLocation
 
     interface IUpdate with
         member x.Update() =
@@ -86,9 +92,9 @@ type Enemy(duration) as self =
                 lifeLeft <- lifeLeft - (int)rate
                 if lifeLeft <= 0 then
                     deSpawn.Trigger(self)
+                    deSpawned <- true
 
     member x.Update() = (self :> IUpdate).Update()
-
     new() = Enemy(20000)
 
 type Neutral(d:Direction) = 

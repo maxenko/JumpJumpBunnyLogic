@@ -13,3 +13,4 @@ type HexGrid(rows,columns,maxCellSize,minCellSize) =
     //member x.Map with get() = map
     member x.Coordinates with get() = coordsArray
     member x.Islands with get()     = islandsArray
+    member x.GetRandIsland() = Math.randEl coords
