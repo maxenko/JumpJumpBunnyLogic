@@ -257,6 +257,8 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
                     size <- if nextSize <= minSize then minSize else nextSize
                     self.OnSizeChange(previousSize,nextSize) // trigger size change
             else ()
+    
+    member x.Update() = (self :> IUpdate).Update()
 
     member x.ToDebugString() =
         sprintf "Starting Size: %f\nCurrent: %f\nDecay: %f\nTwo Sec to Despan: %b\nDespanwed: %b\nRespawn delay: %f\nDifficulty: %A" 
