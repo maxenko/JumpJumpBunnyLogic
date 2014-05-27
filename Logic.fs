@@ -51,8 +51,10 @@ type Proto() as self =
         currentLoc <- currentLoc
         jump.Trigger( new JumpEventArgs( previousLoc, currentLoc ) )
 
-    interface IUpdate with
-        member x.Update() = ()
+    member x.JumpTo(d:Direction) =
+        ()
+
+    interface IUpdate with member x.Update() = ()
 
     member x.Update() = (self :> IUpdate).Update()
 
@@ -234,12 +236,10 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
         despawn.Trigger(self)
 
     member x.Start() = active <- true
-
     member x.Stop() = active <- false 
 
-    interface IUpdate with
-        member x.Update() =
-            if active && isTimeToUpdate() then
+    member x.Update() =
+        if active && isTimeToUpdate() then
                 let decay = self.DecayRate
                 let nextSize = size - decay // linear rate for now, might have to change or add options to various dynamics later
                 let previousSize = size
@@ -258,13 +258,13 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
                     let amountLeftToMinSize = (size - minSize)*lifeSpan
                     let twoSecondSpan = 2.0f*everyNthOfSecond*updateIntervalMS
                     if twoSecondSpan >= amountLeftToMinSize && not twoSecondToDespawnEventTriggered then
-                       self.OnTwoSecondsToDespawn()
+                        self.OnTwoSecondsToDespawn()
                    
                     size <- if nextSize <= minSize then minSize else nextSize
                     self.OnSizeChange(previousSize,nextSize) // trigger size change
             else ()
-    
-    member x.Update() = (self :> IUpdate).Update()
+
+    interface IUpdate with member x.Update() = (self :> IUpdate).Update()
 
     member x.ToDebugString() =
         sprintf "Starting Size: %f\nCurrent: %f\nDecay: %f\nTwo Sec to Despan: %b\nDespanwed: %b\nRespawn delay: %f\nDifficulty: %A" 
