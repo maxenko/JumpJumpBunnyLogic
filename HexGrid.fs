@@ -9,9 +9,9 @@ type HexGrid(rows,columns,maxCellSize:single,minCellSize:single) =
 
     let coordsArray = Seq.toArray(coords)
     let islands = [ for c in coords do
-                    let gridCellSize2 = Math.rndBetweenF minCellSize maxCellSize
-                    yield 
-                        new Island( c, gridCellSize2, minCellSize, maxCellSize, IslandDifficulty.Easy, 3000.f ) 
+                        let gridCellSize2 = Math.rndBetweenF minCellSize maxCellSize
+                        yield 
+                            new Island( c, gridCellSize2, minCellSize, maxCellSize, IslandDifficulty.Challenging, 3000.f ) 
     ]
     let islandsArray = Seq.toArray(islands) 
 
