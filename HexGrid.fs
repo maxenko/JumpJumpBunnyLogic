@@ -1,13 +1,18 @@
 ﻿namespace JumpJumpBunny
 
-type HexGrid(rows,columns,maxCellSize,minCellSize) = 
+type HexGrid(rows,columns,maxCellSize:single,minCellSize:single) = 
+    let map = new HexGridMap(rows,columns)
     
-    let map = new HexGridMap(rows,columns,maxCellSize)
     let coords = 
         let cs = map.MakeCells()
         cs
+
     let coordsArray = Seq.toArray(coords)
-    let islands = [ for c in coords do yield new Island( c, maxCellSize, minCellSize, maxCellSize, IslandDifficulty.Challenging, 3000.f ) ]
+    let islands = [ for c in coords do
+                    let gridCellSize2 = Math.rndBetweenF minCellSize maxCellSize
+                    yield 
+                        new Island( c, gridCellSize2, minCellSize, maxCellSize, IslandDifficulty.Easy, 3000.f ) 
+    ]
     let islandsArray = Seq.toArray(islands) 
 
     //member x.Map with get() = map
