@@ -11,7 +11,7 @@ type HexGrid(rows,columns,maxCellSize:single,minCellSize:single) =
     let islands = [ for c in coords do
                         let gridCellSize2 = Math.rndBetweenF minCellSize maxCellSize
                         yield 
-                            new Island( c, gridCellSize2, minCellSize, maxCellSize, IslandDifficulty.Challenging, 3000.f ) 
+                            new Island( c, gridCellSize2, minCellSize, maxCellSize, IslandDifficulty.Effortless, 3000.f ) 
     ]
     let islandsArray = Seq.toArray(islands) 
 

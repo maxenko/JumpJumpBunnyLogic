@@ -14,6 +14,7 @@ module Math =
 
     let rec repeatElement n e =
         match n with
+        | n when n < 1 -> []
         | 1 -> [e]
         | _ -> [e] @ repeatElement (n-1) e
 
