@@ -20,30 +20,24 @@ module Math =
 
     let rndBetween min max = rnd.Next(min,max)
 
-    let rndBetweenF min max  =
+    let rndBetweenF min max =
         let seed = single <| Math.Abs(rnd.NextDouble() * 2.0 - 1.0)
         let space = max - min
         single <| seed * space + min 
         
+    let positiveOrZero x = if x >= 0 then x else 0
 
-    let probabilityRange f s peak spread = // this may need further testing, but should work for now
-        let len = abs(s - f)
-        let mask1 = Array.init len ( fun _ -> 1 )   
+    let probabilityRange f s peak spread = // creates a range of repeated numbers based on their spread distance from peak
         let s = [|f .. s|]
-        let leftmost    = peak - spread
-        let rightmost   = peak + spread
-
-        let addWeight i = // calculates additional weight for the number depending on its distance from peak number
-            if s.[i] < rightmost && s.[i] > leftmost then // if within spread of a the peak number
-                let diff = abs ( peak - abs(s.[i]) )
-                peak - diff    
-            else 0
-
-        mask1 
-        |> Seq.mapi (fun i x -> x + addWeight i )       // repeat mask
-        |> Seq.mapi (fun i x -> repeatElement x s.[i] ) // sequences of repeated numbers
-        |> Seq.concat
-        |> Seq.toArray
+        let repeatTimes n = 
+            let dist = abs(n - peak)
+            if dist > spread then 0
+            else spread - dist
+        s
+        |> Array.map (fun n -> repeatTimes n)
+        |> Array.mapi (fun i n -> repeatElement n s.[i])
+        |> Array.toList
+        |> List.concat
 
     let getRandomFromRange f s peak spread =
         let s = probabilityRange f s peak spread
