@@ -18,6 +18,7 @@ type Proto() as self =
     let jump        = new Event<JumpEventArgs>()
     let collect     = new Event<Powerups>()
     let stageFinish = new Event<Proto>()
+    let actionDenied= new Event<JumpJumpBunny.Action>()
     let mutable previousLoc = new HexCellCoord(0,0,0,0.f,0.f)
     let mutable currentLoc  = new HexCellCoord(0,0,0,0.f,0.f)
 
@@ -43,13 +44,15 @@ type Proto() as self =
     [<CLIEvent>]
     member x.StageFinish = stageFinish.Publish
 
-    member x.AddPoints(p) = self.Points <- self.Points + p
-    member x.AddLives(l) = self.Lives <- self.Lives + l
-    member x.OnCollect() = collect.Trigger Powerups.None
+    member x.AddPoints(p)   = self.Points <- self.Points + p
+    member x.AddLives(l)    = self.Lives <- self.Lives + l
+    member x.OnCollect()    = collect.Trigger Powerups.None
     member x.OnJump(fromLoc,toLoc) = 
         previousLoc <- fromLoc
         currentLoc <- currentLoc
         jump.Trigger( new JumpEventArgs( previousLoc, currentLoc ) )
+
+    member x.OnDenied() = actionDenied.Trigger Action.Jump
 
     member x.JumpTo(d:Direction) =
         ()

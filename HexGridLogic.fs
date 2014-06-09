@@ -29,7 +29,7 @@ type HexVector =
 
 type HexCellNeighbors<'n>(cell:'n) =
     let parent = cell
-    static let findNeighbor (d:Direction) =
+    let findNeighbor (d:Direction) =
         0
     member x.NE with get() = findNeighbor(Direction.NE)
     member x.NW with get() = findNeighbor(Direction.NW)

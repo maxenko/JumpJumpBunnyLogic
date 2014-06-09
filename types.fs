@@ -59,5 +59,8 @@ type Probability =
 | Often     = 2
 | VeryOften = 3
 
+type Action =
+| Jump      = 1
+
 type IUpdate =
     abstract Update : unit -> unit
