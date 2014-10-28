@@ -3,6 +3,14 @@
 open System
 open System.Collections.Generic
 
+type Direction =
+    | NE    = 0
+    | NW    = 2
+    | E     = 4
+    | W     = 8
+    | SE    = 16
+    | SW    = 32
+
 type EntityState =
 | Normal = 0
 | Invulnerable = 1

@@ -13,14 +13,15 @@ type IslandSizeChangeArgs<'i>( island:'i, previousSize : single, newSize : singl
     member val NewSize = newSize with get
 
 type Proto() as self =
+    let nowhere = new HexCellCoord(-1,-1,-1,100000.f,100000.f)
     let death       = new Event<Proto>()
     let reSpawn     = new Event<Proto>()
     let jump        = new Event<JumpEventArgs>()
     let collect     = new Event<Powerups>()
     let stageFinish = new Event<Proto>()
     let actionDenied= new Event<JumpJumpBunny.Action>()
-    let mutable previousLoc = new HexCellCoord(0,0,0,0.f,0.f)
-    let mutable currentLoc  = new HexCellCoord(0,0,0,0.f,0.f)
+    let mutable previousLoc = nowhere
+    let mutable currentLoc  = nowhere
 
     member val Lives    = 1 with get, set
     member val Points   = 0 with get, set
@@ -54,7 +55,8 @@ type Proto() as self =
 
     member x.OnDenied() = actionDenied.Trigger Action.Jump
 
-    member x.JumpTo(d:Direction) =
+    member x.JumpTo(curLoc,newLoc) =
+        x.OnJump(curLoc,newLoc)
         ()
 
     interface IUpdate with member x.Update() = ()
@@ -106,7 +108,7 @@ type Neutral(d:Direction) =
     inherit Enemy()
     member val Direction = d with get, set
 
-type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : single, initialDifficulty : IslandDifficulty, respawnDelay: single) as self =
+type Island(obj:UnityEngine.GameObject, h:HexCellCoord, initialSize : single, minSize : single, maxSize : single, initialDifficulty : IslandDifficulty, respawnDelay: single) as self =
 
     static let rand = new System.Random(DateTime.Now.Millisecond)
     static let nobody = new Nobody() :> Proto
@@ -118,7 +120,7 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
     let mutable difficulty = initialDifficulty
     let mutable lifeSpan = 0.f
     let mutable respawnDelay = 0.f
-    let mutable occupier = nobody
+    let mutable occupier : Proto = nobody
     
     let randIslandRespawnDelay() =
         let enumVals = typeof<IslandRespawnDelay> |> Enum.GetValues
@@ -149,6 +151,7 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
     let sizeChange = new Event<IslandSizeChangeArgs<Island>>()
     let vacated = new Event<IslandVacatedArgs>()
     let occupied = new Event<IslandOccupiedArgs>()
+    let touched = new Event<Island>()
 
     let reset() =
         size <- initialSize // needs to randomize
@@ -189,6 +192,12 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
 
     member val InitialSize = initialSize with get
     member x.DecayRate with get() = getDecayFor difficulty
+    member val GameObject : UnityEngine.GameObject = obj with get, set
+    
+    member x.GetActive() = not despawnTriggered
+    
+    [<CLIEvent>]
+    member x.Touched= touched.Publish
 
     [<CLIEvent>]
     member x.Respawn = respawn.Publish
@@ -208,7 +217,7 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
     [<CLIEvent>]
     member x.TwoSecondsToDespawn = twoSecondsToDespawn.Publish
 
-    member x.FakeEventCall() = respawn.Trigger(self)
+    member x.FakeEventCall() = respawn.Trigger self 
 
     member val Coord = h with get
 
@@ -218,12 +227,22 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
     member x.OnTwoSecondsToDespawn() =
         if not twoSecondToDespawnEventTriggered then
             twoSecondToDespawnEventTriggered <- true
-            twoSecondsToDespawn.Trigger(self)
+            twoSecondsToDespawn.Trigger self
 
     member x.Occupy( entity:Proto ) =
         occupier <- entity
         occupied.Trigger(  new IslandOccupiedArgs(occupier,occupier.PreviousLoc)  )
         
+    member x.OnTouched() = 
+        (*
+        match occupier with
+        | :? Nobody ->  ()
+            // check neighbors for player
+        | :? Neutral -> ()
+        | :? Enemy -> ()
+        | _ -> // we got a player
+        *)
+        touched.Trigger self
 
     member x.OnVacated(d:Direction) =
         vacated.Trigger( new IslandVacatedArgs(occupier,d) )
@@ -231,12 +250,12 @@ type Island(h:HexCellCoord, initialSize : single, minSize : single, maxSize : si
 
     member x.OnRespawn() =
         reset()
-        respawn.Trigger(self)
+        respawn.Trigger self
 
     member x.OnDespawn() =
         despawnTriggered <- true
         resetSpawnDelay()
-        despawn.Trigger(self)
+        despawn.Trigger self
 
     member x.Start() = active <- true
     member x.Stop() = active <- false 

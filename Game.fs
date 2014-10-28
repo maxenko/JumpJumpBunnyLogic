@@ -2,11 +2,11 @@
 
 module Game =
 
-    type Scene(averageDifficulty : IslandDifficulty, gridW : int, gridH : int, ?customSpawnPos : HexCellCoord) =
+    type Scene(averageDifficulty : IslandDifficulty, radius : int, ?customSpawnPos : HexCellCoord) =
         let spawnPos = defaultArg customSpawnPos (new HexCellCoord(0,0,0))
 
         // set up grid
-        let grid = new HexGrid(gridH,gridW,1.f,0.2f)
+        let grid = new HexGrid(radius,1.f,0.2f)
 
         // add player
         let player = new Proto()

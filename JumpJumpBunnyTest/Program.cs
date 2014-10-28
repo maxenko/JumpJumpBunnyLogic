@@ -49,7 +49,7 @@ namespace JumpJumpBunnyTest
 
         static void Main(string[] args)
         {
-           var grid = new HexGrid(5, 5, 1.0f, 0.1f);
+           var grid = new HexGrid(1, 1.0f, 0.1f);
            var testCell = grid.Islands[0];
            while (Console.ReadLine() != "q") {
                testCell.Update();
