@@ -12,6 +12,10 @@ type IslandSizeChangeArgs<'i>( island:'i, previousSize : single, newSize : singl
     member val PreviousSize = previousSize with get
     member val NewSize = newSize with get
 
+type ActionEvent(a:JumpJumpBunny.Action, d:float32) =
+    let mutable duration = d
+
+
 type Proto() as self =
     let nowhere = new HexCellCoord(-1,-1,-1,100000.f,100000.f)
     let death       = new Event<Proto>()
@@ -26,6 +30,7 @@ type Proto() as self =
     member val Lives    = 1 with get, set
     member val Points   = 0 with get, set
     member val Powerups = Powerups.None with get, set
+    member val CurrentAction = new ActionEvent(Action.Idle,-1.0f)
 
     member x.PreviousLoc  = previousLoc
     member x.CurrentLoc   = stageFinish

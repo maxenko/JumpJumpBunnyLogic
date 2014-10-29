@@ -15,6 +15,8 @@ type EntityState =
 | Normal = 0
 | Invulnerable = 1
 | Immobile = 2
+| Jumping = 3
+| Floating = 4
 
 type Powerups =
 | None          = 0
@@ -68,7 +70,9 @@ type Probability =
 | VeryOften = 3
 
 type Action =
+| Idle      = 0
 | Jump      = 1
+| Float     = 2
 
 type IUpdate =
     abstract Update : unit -> unit
