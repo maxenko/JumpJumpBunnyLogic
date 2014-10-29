@@ -1,6 +1,7 @@
 ﻿namespace JumpJumpBunny
 
 open System
+open UnityEngine
 
 type HexVector =
     static member mask =
@@ -38,7 +39,7 @@ type HexCellNeighbors<'n>(cell:'n) =
     member val SE   = cell with get, set
     member val SW   = cell with get, set
       
-type HexCellCoord(hexX : int, hexY : int, hexZ : int, ?x : single, ?y : single) =
+type HexCellCoord(hexX : int, hexY : int, hexZ : int, ?x : single, ?y : single) as this =
 
     static member Nothing = new HexCellCoord(-1,-1,-1,100000.f,1000000.f) // placeholder, representing non-location
     
@@ -48,7 +49,7 @@ type HexCellCoord(hexX : int, hexY : int, hexZ : int, ?x : single, ?y : single) 
     member val HexZ = hexZ with get
     member val X = defaultArg x 0.0f with get
     member val Y = defaultArg y 0.0f with get
-    member x.Neighbors = new HexCellNeighbors<HexCellCoord>(HexCellCoord.Nothing)
+    member x.Neighbors = new HexCellNeighbors<HexCellCoord>(this)
 
 
 type HexGridMap( radius : int, cellSize : single) =
@@ -69,7 +70,7 @@ type HexGridMap( radius : int, cellSize : single) =
                         if (abs(cubeGridY) <= radius ) then // keep overall shape of the grid hexagonal
                             let cell = new HexCellCoord(x,cubeGridY,z,x2d,y2d)
                             yield cell
-            ] |> Seq.toArray //|> mapNeighbors
+            ] |> Seq.toArray
         
         // map out neighbor coordinates
         let assignCoords (c:HexCellCoord) =
@@ -83,6 +84,8 @@ type HexGridMap( radius : int, cellSize : single) =
             c.Neighbors.SE  <- getC Direction.SE
             c.Neighbors.SW  <- getC Direction.SW
             c.Neighbors.W   <- getC Direction.W
+
+            //UnityEngine.Debug.Log("x: "+c.Neighbors.E.HexX.ToString())
 
         Seq.iter( fun (c : HexCellCoord) ->
             assignCoords c
