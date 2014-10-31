@@ -31,9 +31,10 @@ type Proto() as self =
     member val Points   = 0 with get, set
     member val Powerups = Powerups.None with get, set
     member val CurrentAction = new ActionEvent(Action.Idle,-1.0f)
+    member val GameObject : UnityEngine.GameObject = new UnityEngine.GameObject() with get, set
 
     member x.PreviousLoc  = previousLoc
-    member x.CurrentLoc   = stageFinish
+    member x.CurrentLoc   = currentLoc
     
     [<CLIEvent>]
     member x.Death = death.Publish
@@ -52,6 +53,7 @@ type Proto() as self =
 
     member x.AddPoints(p)   = self.Points <- self.Points + p
     member x.AddLives(l)    = self.Lives <- self.Lives + l
+    member x.MoveTo(c)      = currentLoc <- c
     member x.OnCollect()    = collect.Trigger Powerups.None
     member x.OnJump(fromLoc,toLoc) = 
         previousLoc <- fromLoc
@@ -244,7 +246,7 @@ type Island(obj:UnityEngine.GameObject, h:HexCellCoord, initialSize : single, mi
         | :? Nobody ->  ()
             // check neighbors for player
         | :? Neutral -> ()
-        | :? Enemy -> ()
+        | :? Enemy -> ()                                                                         
         | _ -> // we got a player
         *)
         touched.Trigger self
